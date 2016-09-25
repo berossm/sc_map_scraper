@@ -55,6 +55,23 @@ with open(sql_path + "/affiliation.sql", 'w') as sql_file:
         sql_str = sql_base + sql_row + ";\n"
         sql_file.write(sql_str)
 
+with open(sql_path + "/species.sql", 'w') as sql_file:
+    sql_table = table_base + "species`"
+    sql_str = "CREATE TABLE " + sql_table + " ( `id` INT NOT NULL " +\
+              "AUTO_INCREMENT , `code` VARCHAR(8) NOT NULL , `name` " +\
+              "VARCHAR(64) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;\n"
+    sql_file.write(sql_str)
+    sql_base = "INSERT INTO " + sql_table + \
+               " (`id`, `code`, `name`) VALUES "    
+    for species in base_data["data"]["species"]["resultset"]:
+        sql_row = "('"
+        sql_row += MySQLdb.escape_string(species["id"])
+        sql_row += "', '" + MySQLdb.escape_string(species["code"])
+        sql_row += "', '" + MySQLdb.escape_string(species["name"])
+        sql_row += "')"
+        sql_str = sql_base + sql_row + ";\n"
+        sql_file.write(sql_str)
+
 with open(sql_path + "/systems.sql", 'w') as sql_file:
     sql_table = table_base + "systems`"
     sql_str = "CREATE TABLE " + sql_table + " ( `id` INT NOT NULL " +\
