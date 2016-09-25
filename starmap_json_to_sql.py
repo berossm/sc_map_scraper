@@ -227,6 +227,9 @@ with open(sql_path + "/celestial_objects.sql", 'w') as celestial_objects_file:
                "`habitable`, `fairchanceact`, " + \
                "`sensor_danger`, `sensor_population`, `sensor_economy`, " + \
                "`time_modified`) VALUES "
+    children = {}
+    populations = {}
+    sub_type = {}
     for celestial_objects_src in os.listdir(base_path + "/celestial-objects/"):
         if celestial_objects_src.endswith(".json"):
             with open(base_path + "/celestial-objects/" + celestial_objects_src, 'r') as object_json:
@@ -250,11 +253,16 @@ with open(sql_path + "/celestial_objects.sql", 'w') as celestial_objects_file:
                 sql_row += ", " + str_or_none(object_data, "orbit_period")
                 sql_row += ", " + str_or_none(object_data, "age")
                 sql_row += ", " + str_or_none(object_data, "parent_id")
+                if object_data["parent_id"] != None:
+                    children[int(object_data["id"])] = int(object_data["parent_id"])
                 #TODO: Look at making this a function?
                 if object_data["subtype_id"] == None:
                     sql_row += ", NULL"
                 else:
                     sql_row += ", " + str_or_none(object_data["subtype"], "id")
+                    sub_type[int(object_data["subtype"]["id"])] = \
+                        {'type' : unidecode(object_data["subtype"]["type"]), \
+                        'name' : unidecode(object_data["subtype"]["name"]) }
                 sql_row += ", " + str_or_none(object_data, "habitable")
                 sql_row += ", " + str_or_none(object_data, "fairchanceact")
                 sql_row += ", " + str_or_none(object_data, "sensor_danger")
@@ -264,11 +272,24 @@ with open(sql_path + "/celestial_objects.sql", 'w') as celestial_objects_file:
                 sql_row += ");\n"
                 sql_str = celestial_objects_base + sql_row
                 celestial_objects_file.write(sql_str)
+                #TODO: Process population when any example is available from json data
 
-#TODO: Run sub_type insert - ignore on duplicate
-#TODO: Run populations insert - duplicates allowed
-#TODO: Run children insert - 
-
+sub_type_base = "INSERT INTO " + sub_type_table + \
+                " (`id`, `type`, `name` ) VALUES "
+for index in sub_type:
+    sub_type_row = "('" + str(index) + "', '"
+    sub_type_row += sub_type[index]['type'] + "', '"
+    sub_type_row += sub_type[index]['name'] + "');\n"
+    sub_type_file.write(sub_type_base + sub_type_row)
 sub_type_file.close()
-populations_file.close()
+
+children_base = "INSERT INTO " + children_table + \
+                " (`id`, `parrent_id` ) VALUES "
+for index in children:
+    child_row = "('" + str(index) + "', '"
+    child_row += str(children[index]) + "');\n"
+    children_file.write(children_base + child_row)
 children_file.close()
+
+#TODO: Run populations insert - duplicates allowed
+populations_file.close()
