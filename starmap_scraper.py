@@ -6,7 +6,7 @@ import os
 base_url = "https://robertsspaceindustries.com/api/starmap"
 base_path = "./starmap"
 data_path = "/"
-data_file = "base_data"
+data_file = "bootup"
 req = urllib2.Request(base_url + data_path + data_file, '')
 response = urllib2.urlopen(req)
 json_str = response.read()
