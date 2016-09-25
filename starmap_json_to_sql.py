@@ -72,6 +72,31 @@ with open(sql_path + "/species.sql", 'w') as sql_file:
         sql_str = sql_base + sql_row + ";\n"
         sql_file.write(sql_str)
 
+with open(sql_path + "/tunnels.sql", 'w') as sql_file:
+    sql_table = table_base + "tunnels`"
+    sql_str = "CREATE TABLE " + sql_table + " ( `id` INT NOT NULL " +\
+              "AUTO_INCREMENT , `name` VARCHAR(128) , `size` " +\
+              "VARCHAR(1) NOT NULL , `direction` VARCHAR(1) NOT NULL , " +\
+              "`entry_id` INT NOT NULL , `exit_id` INT NOT NULL , " +\
+              "PRIMARY KEY (`id`)) ENGINE = InnoDB;\n"
+    sql_file.write(sql_str)
+    sql_base = "INSERT INTO " + sql_table + \
+               " (`id`, `name`, `size`, `direction`, `entry_id`, `exit_id`) VALUES "
+    for tunnel in base_data["data"]["tunnels"]["resultset"]:
+        sql_row = "('"
+        sql_row += MySQLdb.escape_string(tunnel["id"])
+        if tunnel["name"] == None:
+            sql_row += "', '"
+        else:
+            sql_row += "', '" + MySQLdb.escape_string(tunnel["name"])
+        sql_row += "', '" + MySQLdb.escape_string(tunnel["size"])
+        sql_row += "', '" + MySQLdb.escape_string(tunnel["direction"])
+        sql_row += "', '" + value_or_none(tunnel["entry_id"])
+        sql_row += "', '" + value_or_none(tunnel["exit_id"])
+        sql_row += "')"
+        sql_str = sql_base + sql_row + ";\n"
+        sql_file.write(sql_str)
+
 with open(sql_path + "/systems.sql", 'w') as sql_file:
     sql_table = table_base + "systems`"
     sql_str = "CREATE TABLE " + sql_table + " ( `id` INT NOT NULL " +\
@@ -98,26 +123,26 @@ with open(sql_path + "/systems.sql", 'w') as sql_file:
         if system_file.endswith(".json"):
             with open(base_path + "/star-systems/"+system_file, 'r') as system_json:
                 system_data = json.load(system_json)["data"]["resultset"][0]
-                sql_rows = "('"
-                sql_rows += MySQLdb.escape_string(system_data["id"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["code"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["name"])
+                sql_row = "('"
+                sql_row += MySQLdb.escape_string(system_data["id"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["code"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["name"])
                 decoded_description = unidecode(system_data["description"])
-                sql_rows += "', '" + MySQLdb.escape_string(decoded_description)
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["type"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["position_z"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["position_x"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["position_y"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["affiliation"][0]["id"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["status"])
-                sql_rows += "', '" + value_or_none(system_data["habitable_zone_inner"])
-                sql_rows += "', '" + value_or_none(system_data["habitable_zone_outer"])
-                sql_rows += "', '" + value_or_none(system_data["frost_line"])
-                sql_rows += "', '" + value_or_none(system_data["aggregated_size"])
-                sql_rows += "', '" + value_or_none(system_data["aggregated_population"])
-                sql_rows += "', '" + value_or_none(system_data["aggregated_economy"])
-                sql_rows += "', '" + value_or_none(system_data["aggregated_danger"])
-                sql_rows += "', '" + MySQLdb.escape_string(system_data["time_modified"])
-                sql_rows += "')"
-                sql_str = sql_base + sql_rows + ";\n"
+                sql_row += "', '" + MySQLdb.escape_string(decoded_description)
+                sql_row += "', '" + MySQLdb.escape_string(system_data["type"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["position_z"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["position_x"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["position_y"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["affiliation"][0]["id"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["status"])
+                sql_row += "', '" + value_or_none(system_data["habitable_zone_inner"])
+                sql_row += "', '" + value_or_none(system_data["habitable_zone_outer"])
+                sql_row += "', '" + value_or_none(system_data["frost_line"])
+                sql_row += "', '" + value_or_none(system_data["aggregated_size"])
+                sql_row += "', '" + value_or_none(system_data["aggregated_population"])
+                sql_row += "', '" + value_or_none(system_data["aggregated_economy"])
+                sql_row += "', '" + value_or_none(system_data["aggregated_danger"])
+                sql_row += "', '" + MySQLdb.escape_string(system_data["time_modified"])
+                sql_row += "')"
+                sql_str = sql_base + sql_row + ";\n"
                 sql_file.write(sql_str)
